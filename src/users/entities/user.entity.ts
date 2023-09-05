@@ -1,4 +1,3 @@
-import { IsEmail } from 'class-validator';
 import {
   Column,
   Entity,
@@ -7,6 +6,7 @@ import {
   AfterUpdate,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { IsEmail } from 'class-validator';
 
 // typeORM hooks ни позволяват да дефинираме функции в ентитито,
 // които могат да бъдат извиквани
