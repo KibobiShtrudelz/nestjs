@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
 
 import { Repository } from 'typeorm';
 
@@ -18,7 +18,13 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found!`);
+    }
+
+    return user;
   }
 
   async find(email: string) {
@@ -26,32 +32,24 @@ export class UsersService {
   }
 
   async update(id: number, attrs: Partial<User>) {
-    try {
-      const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ where: { id } });
 
-      if (!user) {
-        throw new Error(`User with ID ${id} not found!`);
-      }
-
-      Object.assign(user, attrs);
-
-      return this.userRepository.save(user);
-    } catch (error) {
-      throw new Error(`Updating user with ID ${id} has thrown an error!`);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found!`);
     }
+
+    Object.assign(user, attrs);
+
+    return this.userRepository.save(user);
   }
 
   async remove(id: number) {
-    try {
-      const user = await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ where: { id } });
 
-      if (!user) {
-        throw new Error(`User with ID ${id} not found!`);
-      }
-
-      return this.userRepository.remove(user);
-    } catch (error) {
-      throw new Error(`Deleting user with ID ${id} has thrown an error!`);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found!`);
     }
+
+    return this.userRepository.remove(user);
   }
 }
