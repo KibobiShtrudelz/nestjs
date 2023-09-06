@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn
 } from 'typeorm'
 import { IsEmail } from 'class-validator'
+import { Exclude } from 'class-transformer'
 
 // typeORM hooks ни позволяват да дефинираме функции в ентитито,
 // които могат да бъдат извиквани
@@ -20,6 +21,7 @@ export class User {
   email: string
 
   @Column()
+  @Exclude()
   password: string
 
   @AfterInsert() // Всеки път, когато създаваме user в DB-то ни typeORM ще извиква този метод
