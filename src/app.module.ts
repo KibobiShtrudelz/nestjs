@@ -1,16 +1,16 @@
-import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common'
 
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { UsersModule } from './users/users.module';
-import { ReportsModule } from './reports/reports.module';
+import { UsersModule } from './users/users.module'
+import { ReportsModule } from './reports/reports.module'
 
-import { AppController } from './app.controller';
+import { AppController } from './app.controller'
 
-import { AppService } from './app.service';
+import { AppService } from './app.service'
 
-import { User } from './users/entities/user.entity';
-import { Report } from './reports/entities/report.entity';
+import { User } from './users/entities/user.entity'
+import { Report } from './reports/entities/report.entity'
 
 @Module({
   imports: [
@@ -18,12 +18,12 @@ import { Report } from './reports/entities/report.entity';
       type: 'sqlite',
       database: 'db.sqlite',
       entities: [User, Report],
-      synchronize: true,
+      synchronize: true
     }),
     UsersModule,
-    ReportsModule,
+    ReportsModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule {}
