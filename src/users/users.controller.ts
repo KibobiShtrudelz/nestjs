@@ -1,29 +1,51 @@
-import {
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Query,
-  Delete,
-  Controller,
-  UseInterceptors
-} from '@nestjs/common'
+import { Get, Post, Body, Patch, Param, Query, Delete, Session, Controller } from '@nestjs/common'
 
 import { UserDto } from './dtos/user.dto'
+import { AuthService } from './auth.service'
+import { User } from './entities/user.entity'
 import { UsersService } from './users.service'
-import { CreateUserDto } from './dtos/create-user.dto'
+import { SignUserDto } from './dtos/sign-user.dto'
 import { UpdateUserDto } from './dtos/update-user.dto'
-import { Serialize } from '../interceptors/serializa.interceptopr'
+import { CurrentUser } from './decorators/current-user.decorator'
+import { Serialize } from '../interceptors/serialize.interceptopr'
 
 @Controller('auth')
 @Serialize(UserDto)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService
+  ) {}
+
+  @Get('/who-am-i')
+  whoAmI(@CurrentUser() user: User) {
+    // Създавайки "CurrentUser" декоратора си правим кода четим, защото изнасяме логиката за взимане на user в самият декоратор и не я пишем тук
+    return user
+  }
 
   @Post('/sign-up')
-  createUser(@Body() body: CreateUserDto) {
-    return this.usersService.create(body.email, body.password)
+  async createUser(@Body() body: SignUserDto, @Session() session: any) {
+    const user = await this.authService.signUp(body.email, body.password)
+
+    session.userId = user.id // Обновяваме сесията с "id"-то на потребителя
+
+    return user
+  }
+
+  @Post('/sign-in')
+  async signIn(@Body() body: SignUserDto, @Session() session: any) {
+    const user = await this.authService.signIn(body.email, body.password)
+
+    session.userId = user.id // Обновяваме сесията с "id"-то на потребителя
+
+    return user
+  }
+
+  @Post('/sign-out')
+  signOut(@Session() session: any) {
+    session.userId = null
+
+    return {}
   }
 
   @Get('/:id')

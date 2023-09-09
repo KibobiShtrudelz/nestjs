@@ -22,8 +22,26 @@ export class AuthService {
     const hash = (await scrypt(password, salt, 32)) as Buffer // cast-ваме "as Buffer", защото TS не знае, че това е промис и го отчита като "unknown"
     const result = `${salt}.${hash.toString('hex')}`
 
-    // 75. Creating a User 00:00
+    const user = await this.usersService.create(email, result)
+
+    return user
   }
 
-  signIn(email: string, password: string) {}
+  async signIn(email: string, password: string) {
+    const [user] = await this.usersService.find(email)
+
+    if (!user) {
+      throw new BadRequestException('Invalid email or password')
+    }
+
+    const [salt, storedHash] = user.password.split('.')
+    const hash = (await scrypt(password, salt, 32)) as Buffer
+    const result = hash.toString('hex')
+
+    if (storedHash !== result) {
+      throw new BadRequestException('Invalid email or password')
+    }
+
+    return user
+  }
 }
