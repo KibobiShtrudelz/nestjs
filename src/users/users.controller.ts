@@ -1,9 +1,21 @@
-import { Get, Post, Body, Patch, Param, Query, Delete, Session, Controller } from '@nestjs/common'
+import {
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Query,
+  Delete,
+  Session,
+  UseGuards,
+  Controller
+} from '@nestjs/common'
 
 import { UserDto } from './dtos/user.dto'
 import { AuthService } from './auth.service'
 import { User } from './entities/user.entity'
 import { UsersService } from './users.service'
+import { AuthGuard } from '../guards/auth.guard'
 import { SignUserDto } from './dtos/sign-user.dto'
 import { UpdateUserDto } from './dtos/update-user.dto'
 import { CurrentUser } from './decorators/current-user.decorator'
@@ -18,6 +30,7 @@ export class UsersController {
   ) {}
 
   @Get('/who-am-i')
+  @UseGuards(AuthGuard)
   whoAmI(@CurrentUser() user: User) {
     // Създавайки "CurrentUser" декоратора си правим кода четим, защото изнасяме логиката за взимане на user в самият декоратор и не я пишем тук
     return user
