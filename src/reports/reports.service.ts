@@ -13,7 +13,7 @@ export class ReportsService {
 
   create(reportDto: CreateReportDto, user: User) {
     const report = this.reportsRepository.create(reportDto)
-    report.user = user // Зад колисите репозиторито ще закачи към "report"-а САМО "userId"-то към "report" обекта
+    report.user = user
 
     return this.reportsRepository.save(report)
   }
