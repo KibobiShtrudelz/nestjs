@@ -1,23 +1,21 @@
-import { Module } from '@nestjs/common'
-import { APP_INTERCEPTOR } from '@nestjs/core'
 import { TypeOrmModule } from '@nestjs/typeorm'
+import { Module, MiddlewareConsumer } from '@nestjs/common'
+
+import { UsersController } from './users.controller'
 
 import { AuthService } from './auth.service'
-import { User } from './entities/user.entity'
 import { UsersService } from './users.service'
-import { UsersController } from './users.controller'
-import { CurrentUserInterceptor } from './interceptors/current-user.interceptor'
+
+import { User } from './entities/user.entity'
+import { CurrentUserMiddleware } from './middlewares/current-user.middleware'
 
 @Module({
   imports: [TypeOrmModule.forFeature([User])], // Това създава "repository"-то за нас
   controllers: [UsersController],
-  providers: [
-    UsersService,
-    AuthService,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: CurrentUserInterceptor
-    }
-  ] // За да си ползваме интерцепторите трябва да ги инжектираме в "providers"
+  providers: [UsersService, AuthService]
 })
-export class UsersModule {}
+export class UsersModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(CurrentUserMiddleware).forRoutes('*')
+  }
+}

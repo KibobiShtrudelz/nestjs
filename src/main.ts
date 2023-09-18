@@ -1,18 +1,19 @@
 import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 
-// import { CookieSession } from 'cookie-session' // Заради TS настройки НЕ можем да използваме "import" синтаксиса
-
 import { AppModule } from './app.module'
-
-const cookieSession = require('cookie-session')
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
 
-  app.use(cookieSession({ keys: ['abvgzputklmn'] }))
+  ;(app as any).set('etag', false)
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }))
+  app.use((request, response, next) => {
+    response.removeHeader('X-Powered-By')
+    response.removeHeader('date')
+
+    next()
+  })
 
   await app.listen(3333)
 }
