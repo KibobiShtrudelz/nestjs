@@ -13,6 +13,7 @@ import { AppService } from './app.service'
 import { User } from './users/entities/user.entity'
 import { Report } from './reports/entities/report.entity'
 
+const dbConfig = require('../ormconfig')
 const cookieSession = require('cookie-session')
 
 @Module({
@@ -21,15 +22,7 @@ const cookieSession = require('cookie-session')
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`
     }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'sqlite',
-        database: configService.get<string>('DB_NAME'),
-        synchronize: true,
-        entities: [User, Report]
-      })
-    }),
+    TypeOrmModule.forRoot(dbConfig),
     UsersModule,
     ReportsModule
   ],
